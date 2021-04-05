@@ -63,6 +63,7 @@ public class ManualController {
 		}
 		
 		
+		
 		try {
 			Manual newManual = manualService.save(objManual, fileImagen.getBytes(), fileArchivo.getBytes(), byteFileVideo); 
 			datos.put(MSJ, MSJ_MANUAL_REGISTRADO_CORRECTAMENTE);

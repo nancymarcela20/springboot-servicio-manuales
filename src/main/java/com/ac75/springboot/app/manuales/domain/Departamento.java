@@ -15,6 +15,10 @@ import javax.persistence.Table;
 import javax.persistence.Temporal;
 import javax.persistence.TemporalType;
 
+import com.fasterxml.jackson.annotation.JsonBackReference;
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import com.fasterxml.jackson.annotation.JsonManagedReference;
+
 @Entity
 @Table(name= "departamentos")
 public class Departamento implements Serializable{
@@ -22,7 +26,7 @@ public class Departamento implements Serializable{
 	/**
 	 * 
 	 */
-	private static final long serialVersionUID = 1L;
+	private static final long serialVersionUID = 2406291177321559498L;
 
 	@Id
 	@Column(name="id")
@@ -36,18 +40,17 @@ public class Departamento implements Serializable{
 	private String codigo;
 	
 	@Column(name="fecharegistro", nullable = false)
-	@Temporal(TemporalType.DATE)
 	private Date fechaRegistro;
 	
 	@Column(name="fechaactualiacion", nullable = false)
-	@Temporal(TemporalType.DATE)
 	private Date fechaActualizacion;
 	
 	@Column(name = "estado")
 	private boolean estado;	
 	
 	
-	@OneToMany(cascade = CascadeType.ALL, mappedBy = "departamento") 
+	@OneToMany(mappedBy = "departamento", cascade = CascadeType.ALL) 	
+	@JsonManagedReference
 	private	List<Clasificacion> clasificaciones;
 	 
 

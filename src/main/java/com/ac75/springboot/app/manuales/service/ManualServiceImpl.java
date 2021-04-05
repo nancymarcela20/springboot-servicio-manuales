@@ -21,6 +21,13 @@ public class ManualServiceImpl implements IManualService {
 	private static final String MSJ_YA_EXISTE_UN_MANUAL_CON_EL_MISMO_NOMBRE = "Ya existe un manual con el mismo nombre";
 	private static final String MSJ_EL_NOMBRE_DEL_MANUAL_ES_REQUERIDO = "El nombre del manual es requerido";
 	private static final String MSJ_EL_MANUAL_NO_EXISTE = "No existe un manual con el identificado indicado";
+	private static final String MSJ_TIPO_EXTENSION_DE_IMAGEN_NO_VALIDO = "Extensión de imagen no válida";
+	private static final String MSJ_TIPO_EXTENSION_DE_ARCHIVO_NO_VALIDO = "Extensión de imagen no válida";
+	private static final String MSJ_TIPO_EXTENSION_DE_VIDEO_NO_VALIDO = "Extensión de imagen no válida";
+	private static final String rutaImagen = "C:/xampp/htdocs/manuales/imagenes";
+	private static final String rutaArchivo = "C:/xampp/htdocs/manuales/archivos";
+	private static final String rutaVideo = "C:/xampp/htdocs/manuales/videos";
+	
 	
 	@Autowired
 	private IManualRepository manualRepository;
@@ -30,6 +37,8 @@ public class ManualServiceImpl implements IManualService {
 	
 	@Override
 	public Manual save(Manual manual, byte[] fileImagen, byte[] fileArchivo, byte[] fileVideo) throws Exception {
+			
+		String tipo = "";
 		
 		if(manual.getNombre().isEmpty()) {
 			throw new Exception(MSJ_EL_NOMBRE_DEL_MANUAL_ES_REQUERIDO);
@@ -39,25 +48,36 @@ public class ManualServiceImpl implements IManualService {
 			throw new Exception(MSJ_YA_EXISTE_UN_MANUAL_CON_EL_MISMO_NOMBRE);
 		}
 		
-				
-		//Se obtienen las url para imagen, archivo y video de la tabla path
-		String rutaImagen = "C:/xampp/htdocs/manual/imagenes";
-		String rutaArchivo = "C:/xampp/htdocs/manual/archivos";
-		String rutaVideo = "C:/xampp/htdocs/manual/videos";
+		String [] extImagen = manual.getUrlImagen().split(".");
+		tipo = extImagen[1];
 		
+		if(tipo.equals("jpg")||tipo.equals("png")||tipo.endsWith("gif")) {
+			this.saveArchivo(fileImagen, rutaImagen, manual.getUrlImagen());
+			manual.setUrlImagen(rutaImagen+"/"+manual.getUrlImagen());
+		}else{
+			throw new Exception(MSJ_TIPO_EXTENSION_DE_IMAGEN_NO_VALIDO);
+		}
+			
+		String [] extArchivo = manual.getUrlArchivo().split(".");
+		tipo = extArchivo[1];
 		
-		this.saveArchivo(fileImagen, rutaImagen, manual.getUrlImagen());
-		manual.setUrlImagen(rutaImagen+"/"+manual.getUrlImagen());
+		if(tipo.equals("pdf")||tipo.equals("PDF")){
+			this.saveArchivo(fileArchivo, rutaArchivo, manual.getUrlArchivo());
+			manual.setUrlArchivo(rutaArchivo+"/"+manual.getUrlArchivo());
+		}else {
+			throw new Exception(MSJ_TIPO_EXTENSION_DE_ARCHIVO_NO_VALIDO);
+		}
 		
-		this.saveArchivo(fileArchivo, rutaArchivo, manual.getUrlArchivo());
-		manual.setUrlArchivo(rutaArchivo+"/"+manual.getUrlArchivo());
+		String [] extVideo = manual.getUrlArchivo().split(".");
+		tipo = extVideo[1];
 		
-		if(fileVideo!=null) {
+		if(fileVideo!=null&&(tipo.equals("mp4")||tipo.equals("WMV"))) {
 			this.saveArchivo(fileArchivo,rutaVideo, manual.getUrlVideo());
 			manual.setUrlVideo(rutaVideo+"/"+manual.getUrlVideo());
 		}else {
-			manual.setUrlVideo("");
+			throw new Exception(MSJ_TIPO_EXTENSION_DE_ARCHIVO_NO_VALIDO);
 		}
+		
 		
 		Date fecha = new Date();
 		
@@ -74,6 +94,7 @@ public class ManualServiceImpl implements IManualService {
 		return manual;
 	}
 	
+		
 	private void saveArchivo(byte[] archivo, String ruta, String fileName)  {
 		
 		Path url = Paths.get(ruta, fileName);		
@@ -101,13 +122,7 @@ public class ManualServiceImpl implements IManualService {
 		manualbd.setNombre(manual.getNombre());
 		manualbd.setDescripcion(manual.getDescripcion());
 		manualbd.setEstado(manual.isEstado());		
-		
-		//Se obtienen las url para imagen, archivo y video de la tabla path
-		String rutaImagen = "C:/xampp/htdocs/manual/imagenes";
-		String rutaArchivo = "C:/xampp/htdocs/manual/archivos";
-		String rutaVideo = "C:/xampp/htdocs/manual/videos";
-				
-				
+						
 		this.saveArchivo(fileImagen, rutaImagen, manual.getUrlImagen());
 		manualbd.setUrlImagen(rutaImagen+"/"+manual.getUrlImagen());
 				

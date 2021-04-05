@@ -37,10 +37,12 @@ public class DepartamentoController {
 	private static final String MSJ_ERROR_CONEXION_PERDIDA = "Error, conexion perdida";
 	private static final String MSJ_ERROR_NO_EXISTE_EL_DEPARTAMENTO = "Error, no existe el departamento";
 	private static final String MSJ_ERROR_NO_SE_PUEDE_ELIMINAR_EL_DEPARTAMENTO = "Error, no se pudo eliminar el departamento";
+	private static final String MSJ_LISTA_DE_DEPARTAMENTOS = "Lista de departamentos";
 	private static final String DEPARTAMENTO = "Departamento";
 	private static final String MSJ = "msj";
 	private static final String STATUS = "status";
 	private static final String SUCCESS = "success";
+	private static final String DEPARTAMENTOS = "Departamentos";
 	
 	
 	@Autowired
@@ -86,11 +88,27 @@ public class DepartamentoController {
 	@GetMapping(path = "obtenerDepartamentos")
 	public ResponseEntity<Object> getAllDepartamento(HttpServletRequest httpServletRequest){
 		
+		HashMap<String, Object> datos= new HashMap<>();
+		Gson gson = new Gson(); 
+		//String JSON;		
+		//List<Departamento> departamentos = departamentoService.getAllDepartamentos();
+		
 		try {
-			List<Departamento> departamentos = departamentoService.getAllDepartamentos();
-			Gson gson = new Gson(); 
-			String json = gson.toJson(departamentos);
-			return new ResponseEntity<>(json, HttpStatus.OK);
+			
+			  List<Departamento> departamentos = departamentoService.getAllDepartamentos();
+			  
+			  
+				/*
+				 * datos.put(DEPARTAMENTOS, departamentos); datos.put(MSJ,
+				 * MSJ_LISTA_DE_DEPARTAMENTOS); datos.put(STATUS, SUCCESS); String json =
+				 * gson.toJson(datos);
+				 */
+			  
+			  //JSON= new Gson().toJson(departamentos); 
+			  return new ResponseEntity<>(departamentos, HttpStatus.OK);
+			 
+			 
+			//return new ResponseEntity<>(departamentos, HttpStatus.OK);
 		} catch (Exception e) {
 			throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, MSJ_ERROR_CONEXION_PERDIDA, e);
 		}

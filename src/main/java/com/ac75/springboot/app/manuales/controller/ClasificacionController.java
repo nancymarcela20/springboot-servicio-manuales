@@ -92,9 +92,9 @@ public class ClasificacionController {
 		
 		try {
 			List<Clasificacion> clasificaciones = clasificacionService.getAllClasificaciones();
-			Gson gson = new Gson(); 
-			String json = gson.toJson(clasificaciones);
-			return new ResponseEntity<>(json, HttpStatus.OK);
+			//Gson gson = new Gson(); 
+			//String json = gson.toJson(clasificaciones);
+			return new ResponseEntity<>(clasificaciones, HttpStatus.OK);
 		} catch (Exception e) {
 			throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, MSJ_ERROR_CONEXION_PERDIDA, e);
 		}

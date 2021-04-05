@@ -18,10 +18,11 @@ import javax.persistence.TemporalType;
 @Table(name="manuales")
 public class Manual implements Serializable{
 
+	
 	/**
 	 * 
 	 */
-	private static final long serialVersionUID = 1L;
+	private static final long serialVersionUID = 5976908612033612677L;
 
 	@Id
 	@Column(name="id")
@@ -35,11 +36,9 @@ public class Manual implements Serializable{
 	private String descripcion;
 	
 	@Column(name="fecharegistro", nullable = false)
-	@Temporal(TemporalType.DATE)
 	private Date fechaRegistro;
 	
 	@Column(name="fechaactualiacion", nullable = false)
-	@Temporal(TemporalType.DATE)
 	private Date fechaActualizacion;
 	
 	@Column(name = "estado")

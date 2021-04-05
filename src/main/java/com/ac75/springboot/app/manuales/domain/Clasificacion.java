@@ -7,6 +7,7 @@ import java.util.List;
 import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.Entity;
+import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
@@ -14,8 +15,10 @@ import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
 import javax.persistence.OneToMany;
 import javax.persistence.Table;
-import javax.persistence.Temporal;
-import javax.persistence.TemporalType;
+
+import com.fasterxml.jackson.annotation.JsonBackReference;
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import com.fasterxml.jackson.annotation.JsonManagedReference;
 
 @Entity
 @Table(name="clasificaciones")
@@ -24,7 +27,7 @@ public class Clasificacion implements Serializable{
 	/**
 	 * 
 	 */
-	private static final long serialVersionUID = 1L;
+	private static final long serialVersionUID = 1279221258518622609L;
 
 	@Id
 	@Column(name="id")
@@ -38,11 +41,9 @@ public class Clasificacion implements Serializable{
 	private String descripcion;
 	
 	@Column(name="fecharegistro")
-	@Temporal(TemporalType.DATE)
 	private Date fechaRegistro;
 	
 	@Column(name="fechaactualiacion")
-	@Temporal(TemporalType.DATE)
 	private Date fechaActualizacion;
 	
 	@Column(name = "estado")
@@ -51,8 +52,9 @@ public class Clasificacion implements Serializable{
 	@OneToMany(cascade = CascadeType.ALL, mappedBy = "clasificacion")
 	private List<Manual> manuales;
 	
-	@ManyToOne
-	@JoinColumn(name = "FK_DEPARTAMENTO", nullable = false, updatable = false)
+	@ManyToOne(cascade = {CascadeType.DETACH})
+	@JoinColumn(name = "FK_DEPARTAMENTO", nullable = false, updatable = false)	
+	@JsonBackReference
 	private Departamento departamento;
 
 	public Long getIdClasificacion() {
