@@ -102,6 +102,7 @@ public class ManualController {
 		
 	@GetMapping(path = "obtenerManuales")
 	public ResponseEntity<Object> getAllManuales(HttpServletRequest httpServletRequest){
+		
 		HashMap<String, Object> datos = new HashMap<>();
 		try {
 			List<Manual> manuales = manualService.getAllManuales();
