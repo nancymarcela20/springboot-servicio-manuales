@@ -49,10 +49,11 @@ public class Clasificacion implements Serializable{
 	@Column(name = "estado")
 	private boolean estado;
 	
-	@OneToMany(cascade = CascadeType.ALL, mappedBy = "clasificacion")
+	@OneToMany(mappedBy = "clasificacion")
+	@JsonManagedReference
 	private List<Manual> manuales;
 	
-	@ManyToOne(cascade = {CascadeType.DETACH})
+	@ManyToOne()
 	@JoinColumn(name = "FK_DEPARTAMENTO", nullable = false, updatable = false)	
 	@JsonBackReference
 	private Departamento departamento;

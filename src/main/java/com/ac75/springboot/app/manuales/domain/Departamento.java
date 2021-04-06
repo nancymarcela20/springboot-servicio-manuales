@@ -49,7 +49,7 @@ public class Departamento implements Serializable{
 	private boolean estado;	
 	
 	
-	@OneToMany(mappedBy = "departamento", cascade = CascadeType.ALL) 	
+	@OneToMany(mappedBy = "departamento") 	
 	@JsonManagedReference
 	private	List<Clasificacion> clasificaciones;
 	 

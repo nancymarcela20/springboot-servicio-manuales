@@ -8,9 +8,13 @@ import java.nio.file.StandardOpenOption;
 import org.springframework.stereotype.Component;
 
 @Component
-public class FileWriter {
+public class FileUtil {
 
 	public Path write(Path path, byte[] content) throws IOException {
 		return Files.write(path, content, StandardOpenOption.CREATE);
+	}
+	
+	public boolean delete(Path path) throws IOException {
+		return Files.deleteIfExists(path);		
 	}
 }

@@ -39,6 +39,8 @@ public class ClasificacionController {
 	private static final String MSJ_ERROR_NO_EXISTE_CLASIFICACION = "Error, no existe la clasificación";
 	private static final String MSJ_ERROR_NO_SE_PUEDE_ELIMINAR_LA_CLASIFICACION = "Error, no se pudo eliminar la clasificación";
 	private static final String CLASIFICACION = "Clasificacion";
+	private static final String CLASIFICACIONES = "Clasificaciones";
+	private static final String LISTA_DE_CLASIFICACIONES = "Lista de clasificaciones";
 	private static final String MSJ = "msj";
 	private static final String STATUS = "status";
 	private static final String SUCCESS = "success";
@@ -71,15 +73,13 @@ public class ClasificacionController {
 	@PutMapping(path = "editarClasificacion/{id}")
 	public ResponseEntity<Object> editClasificacion(@RequestBody Clasificacion clasificacion, @PathVariable Long id){
 								
-		HashMap<String, Object> datos= new HashMap<>();
-		Gson gson = new Gson(); 		
+		HashMap<String, Object> datos= new HashMap<>();	
 		
 		try {
 			datos.put(CLASIFICACION,clasificacionService.edit(clasificacion, id));
 			datos.put(MSJ, MSJ_CLASIFICACION_ACTUALIZADA_CORRECTAMENTE);
 			datos.put(STATUS, SUCCESS);
-			String json = gson.toJson(datos);
-			return new ResponseEntity<>(json, HttpStatus.CREATED);
+			return new ResponseEntity<>(datos, HttpStatus.CREATED);
 		} catch (Exception e) {
 			throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, MSJ_ERROR_CLASIFICACION_NO_EDITADA, e);			
 		}
@@ -90,11 +90,14 @@ public class ClasificacionController {
 	@GetMapping(path = "obtenerClasificaciones")
 	public ResponseEntity<Object> getAllClasificaciones(HttpServletRequest httpServletRequest){
 		
+		HashMap<String, Object> datos= new HashMap<>();	
+		
 		try {
 			List<Clasificacion> clasificaciones = clasificacionService.getAllClasificaciones();
-			//Gson gson = new Gson(); 
-			//String json = gson.toJson(clasificaciones);
-			return new ResponseEntity<>(clasificaciones, HttpStatus.OK);
+			datos.put(CLASIFICACIONES, clasificaciones);
+			datos.put(STATUS, SUCCESS);
+			datos.put(MSJ, LISTA_DE_CLASIFICACIONES);
+			return new ResponseEntity<>(datos, HttpStatus.OK);
 		} catch (Exception e) {
 			throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, MSJ_ERROR_CONEXION_PERDIDA, e);
 		}
@@ -103,11 +106,13 @@ public class ClasificacionController {
 	
 	
 	@GetMapping("getClasificacionById/{id}")
-	public ResponseEntity<Clasificacion> getClasificacionById(@PathVariable Long id){
-		
+	public ResponseEntity<Object> getClasificacionById(@PathVariable Long id){
+		HashMap<String, Object> datos= new HashMap<>();
 		try {
 			Clasificacion clasificacion = clasificacionService.getClasificacionById(id);
-			return new ResponseEntity<>(clasificacion, HttpStatus.OK);
+			datos.put(CLASIFICACION, clasificacion);
+			datos.put(STATUS, SUCCESS);
+			return new ResponseEntity<>(datos, HttpStatus.OK);
 		} catch (Exception e) {
 			throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, MSJ_ERROR_NO_EXISTE_CLASIFICACION, e);
 		}
@@ -117,13 +122,11 @@ public class ClasificacionController {
 	@DeleteMapping("eliminarClasificacion/{id}")
 	public ResponseEntity<Object> deleteClasificacion(@PathVariable Long id){
 		HashMap<String, Object> datos= new HashMap<>();
-		Gson gson = new Gson(); 
 		try {
 			clasificacionService.delete(id);
 			datos.put(MSJ, MSJ_ELIMINACION+id);
 			datos.put(STATUS, SUCCESS);
-			String json = gson.toJson(datos);
-			return new ResponseEntity<>(json, HttpStatus.OK);
+			return new ResponseEntity<>(datos, HttpStatus.OK);
 		} catch (Exception e) {
 			throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, MSJ_ERROR_NO_SE_PUEDE_ELIMINAR_LA_CLASIFICACION, e);
 		}

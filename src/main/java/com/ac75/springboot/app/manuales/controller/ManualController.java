@@ -38,7 +38,9 @@ public class ManualController {
 	private static final String MSJ_ERROR_NO_EXISTE_EL_MANUAL = "No existe el manual";
 	private static final String MSJ_ELIMINACION = "Se ha eliminado el manual con el id: ";
 	private static final String MSJ_ERROR_NO_SE_PUEDE_ELIMINAR_EL_MANUAL = "No se puede eliminar el manual";
+	private static final String MSJ_LISTA_DE_MANUALES = "Lista de manuales";
 	private static final String MANUAL = "Manual";
+	private static final String MANUALES = "Manuales";
 	private static final String MSJ = "msj";
 	private static final String STATUS = "status";
 	private static final String SUCCESS = "success";	
@@ -61,9 +63,7 @@ public class ManualController {
 		if(!fileVideo.isEmpty()) {
 			byteFileVideo=fileVideo.getBytes();
 		}
-		
-		
-		
+				
 		try {
 			Manual newManual = manualService.save(objManual, fileImagen.getBytes(), fileArchivo.getBytes(), byteFileVideo); 
 			datos.put(MSJ, MSJ_MANUAL_REGISTRADO_CORRECTAMENTE);
@@ -84,7 +84,6 @@ public class ManualController {
 		Manual objManual=newMapper.readValue(manual, Manual.class);
 		
 		HashMap<String, Object> datos = new HashMap<>();
-		Gson gson = new Gson();
 		
 		byte[] byteFileVideo=null;
 		
@@ -98,8 +97,7 @@ public class ManualController {
 			datos.put(MSJ, MSJ_MANUAL_EDITADO_CORRECTAMENTE);
 			datos.put(STATUS, SUCCESS);
 			datos.put(MANUAL, newManual);
-			String json = gson.toJson(datos);
-			return new ResponseEntity<>(json, HttpStatus.CREATED);
+			return new ResponseEntity<>(datos, HttpStatus.CREATED);
 		} catch (Exception e) {
 			throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, MSJ_ERROR_MANUAL_NO_CREADO, e);
 		}
@@ -108,12 +106,13 @@ public class ManualController {
 	
 	@GetMapping(path = "obtenerManuales")
 	public ResponseEntity<Object> getAllManuales(HttpServletRequest httpServletRequest){
-		
+		HashMap<String, Object> datos = new HashMap<>();
 		try {
 			List<Manual> manuales = manualService.getAllManuales();
-			Gson gson = new Gson(); 
-			String json = gson.toJson(manuales);
-			return new ResponseEntity<>(json, HttpStatus.OK);
+			datos.put(MSJ, MSJ_LISTA_DE_MANUALES);
+			datos.put(STATUS, SUCCESS);
+			datos.put(MANUALES, manuales);
+			return new ResponseEntity<>(datos, HttpStatus.OK);
 		} catch (Exception e) {
 			throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, MSJ_ERROR_CONEXION_PERDIDA, e);
 		}
@@ -121,11 +120,13 @@ public class ManualController {
 	}
 	
 	@GetMapping("getManualById/{id}")
-	public ResponseEntity<Manual> getManualById(@PathVariable Long id){
-		
+	public ResponseEntity<Object> getManualById(@PathVariable Long id){
+		HashMap<String, Object> datos= new HashMap<>();
 		try {
 			Manual manual = manualService.getManualById(id);
-			return new ResponseEntity<>(manual, HttpStatus.OK);
+			datos.put(MANUAL, manual);
+			datos.put(STATUS, SUCCESS);
+			return new ResponseEntity<>(datos, HttpStatus.OK);
 		} catch (Exception e) {
 			throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, MSJ_ERROR_NO_EXISTE_EL_MANUAL, e);
 		}
@@ -135,13 +136,11 @@ public class ManualController {
 	@DeleteMapping("eliminarManual/{id}")
 	public ResponseEntity<Object> deleteManual(@PathVariable Long id){
 		HashMap<String, Object> datos= new HashMap<>();
-		Gson gson = new Gson(); 
 		try {
 			manualService.delete(id);
 			datos.put(MSJ, MSJ_ELIMINACION+id);
 			datos.put(STATUS, SUCCESS);
-			String json = gson.toJson(datos);
-			return new ResponseEntity<>(json, HttpStatus.OK);
+			return new ResponseEntity<>(datos, HttpStatus.OK);
 		} catch (Exception e) {
 			throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, MSJ_ERROR_NO_SE_PUEDE_ELIMINAR_EL_MANUAL, e);
 		}

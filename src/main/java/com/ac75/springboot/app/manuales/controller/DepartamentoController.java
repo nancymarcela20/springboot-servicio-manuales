@@ -71,14 +71,12 @@ public class DepartamentoController {
 	public ResponseEntity<Object> editDepartamento(@RequestBody Departamento departamento, @PathVariable Long id){
 								
 		HashMap<String, Object> datos= new HashMap<>();
-		Gson gson = new Gson(); 
 				
 		try {
 			datos.put(DEPARTAMENTO,departamentoService.edit(departamento, id));
 			datos.put(MSJ, MSJ_DEPARTAMENTO_ACTUALIZADO_CORRECTAMENTE);
 			datos.put(STATUS, SUCCESS);
-			String json = gson.toJson(datos);
-			return new ResponseEntity<>(json, HttpStatus.CREATED);
+			return new ResponseEntity<>(datos, HttpStatus.CREATED);
 		} catch (Exception e) {
 			throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, MSJ_ERROR_DEPARTAMENTO_NO_EDITADO, e);			
 		}
@@ -89,26 +87,14 @@ public class DepartamentoController {
 	public ResponseEntity<Object> getAllDepartamento(HttpServletRequest httpServletRequest){
 		
 		HashMap<String, Object> datos= new HashMap<>();
-		Gson gson = new Gson(); 
-		//String JSON;		
-		//List<Departamento> departamentos = departamentoService.getAllDepartamentos();
 		
 		try {
-			
 			  List<Departamento> departamentos = departamentoService.getAllDepartamentos();
+			  datos.put(DEPARTAMENTOS, departamentos); 
+			  datos.put(MSJ, MSJ_LISTA_DE_DEPARTAMENTOS); 
+			  datos.put(STATUS, SUCCESS); 
 			  
-			  
-				/*
-				 * datos.put(DEPARTAMENTOS, departamentos); datos.put(MSJ,
-				 * MSJ_LISTA_DE_DEPARTAMENTOS); datos.put(STATUS, SUCCESS); String json =
-				 * gson.toJson(datos);
-				 */
-			  
-			  //JSON= new Gson().toJson(departamentos); 
-			  return new ResponseEntity<>(departamentos, HttpStatus.OK);
-			 
-			 
-			//return new ResponseEntity<>(departamentos, HttpStatus.OK);
+			  return new ResponseEntity<>(datos, HttpStatus.OK);
 		} catch (Exception e) {
 			throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, MSJ_ERROR_CONEXION_PERDIDA, e);
 		}
@@ -116,11 +102,15 @@ public class DepartamentoController {
 	}
 	
 	@GetMapping("getDepartamentoById/{id}")
-	public ResponseEntity<Departamento> getDepartamentoById(@PathVariable Long id){
+	public ResponseEntity<Object> getDepartamentoById(@PathVariable Long id){
+		
+		HashMap<String, Object> datos= new HashMap<>();
 		
 		try {
 			Departamento departamento = departamentoService.getDepartamentoById(id);
-			return new ResponseEntity<>(departamento, HttpStatus.OK);
+			datos.put(DEPARTAMENTO, departamento);
+			datos.put(STATUS, SUCCESS);
+			return new ResponseEntity<>(datos, HttpStatus.OK);
 		} catch (Exception e) {
 			throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, MSJ_ERROR_NO_EXISTE_EL_DEPARTAMENTO, e);
 		}
@@ -130,13 +120,11 @@ public class DepartamentoController {
 	@DeleteMapping("eliminarDepartamento/{id}")
 	public ResponseEntity<Object> deleteClasificacion(@PathVariable Long id){
 		HashMap<String, Object> datos= new HashMap<>();
-		Gson gson = new Gson(); 
 		try {
 			departamentoService.delete(id);
 			datos.put(MSJ, MSJ_SE_HA_ELIMINADO_EL_DEPARTAMENTO_CON_IDENTIFICADOR+id);
 			datos.put(STATUS, SUCCESS);
-			String json = gson.toJson(datos);
-			return new ResponseEntity<>(json, HttpStatus.OK);
+			return new ResponseEntity<>(datos, HttpStatus.OK);
 		} catch (Exception e) {
 			throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, MSJ_ERROR_NO_SE_PUEDE_ELIMINAR_EL_DEPARTAMENTO, e);
 		}

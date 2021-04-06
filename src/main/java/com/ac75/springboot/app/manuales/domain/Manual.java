@@ -14,6 +14,8 @@ import javax.persistence.Table;
 import javax.persistence.Temporal;
 import javax.persistence.TemporalType;
 
+import com.fasterxml.jackson.annotation.JsonBackReference;
+
 @Entity
 @Table(name="manuales")
 public class Manual implements Serializable{
@@ -55,6 +57,7 @@ public class Manual implements Serializable{
 	
 	@ManyToOne	  
 	@JoinColumn(name = "FK_CLASIFICACION", nullable = false, updatable = false)
+	@JsonBackReference
 	private Clasificacion clasificacion;
 		
 	public Long getIdManual() {
