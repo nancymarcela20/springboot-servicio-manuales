@@ -22,7 +22,6 @@ import org.springframework.web.server.ResponseStatusException;
 
 import com.ac75.springboot.app.manuales.domain.Clasificacion;
 import com.ac75.springboot.app.manuales.service.IClasificacionService;
-import com.google.gson.Gson;
 
 
 @CrossOrigin(origins = "*", methods = {RequestMethod.POST, RequestMethod.GET,RequestMethod.DELETE, RequestMethod.PUT})
@@ -33,11 +32,9 @@ public class ClasificacionController {
 	private static final String MSJ_CLASIFICACION_ACTUALIZADA_CORRECTAMENTE = "Clasificación actualizada correctamente";
 	private static final String MSJ_CLASIFICACION_REGISTRADA_CORRECTAMENTE = "Clasificación registrada correctamente";
 	private static final String MSJ_ELIMINACION = "Se ha eliminado la clasificación con identificador: ";
-	private static final String MSJ_ERROR_CLASIFICACION_NO_CREADA = "Error, clasificación no creada";
 	private static final String MSJ_ERROR_CLASIFICACION_NO_EDITADA = "Error, clasificación no editada";
 	private static final String MSJ_ERROR_CONEXION_PERDIDA = "Error, conexión perdida";
 	private static final String MSJ_ERROR_NO_EXISTE_CLASIFICACION = "Error, no existe la clasificación";
-	private static final String MSJ_ERROR_NO_SE_PUEDE_ELIMINAR_LA_CLASIFICACION = "Error, no se pudo eliminar la clasificación";
 	private static final String CLASIFICACION = "Clasificacion";
 	private static final String CLASIFICACIONES = "Clasificaciones";
 	private static final String LISTA_DE_CLASIFICACIONES = "Lista de clasificaciones";
@@ -54,17 +51,15 @@ public class ClasificacionController {
 	public ResponseEntity<Object> saveClasificacion(@RequestBody Clasificacion clasificacion){
 		HashMap<String, Object> datos= new HashMap<>();	
 		
-		Gson gson = new Gson(); 
 		
 		try {
 			Clasificacion newclasificacion= clasificacionService.save(clasificacion);
 			datos.put(MSJ, MSJ_CLASIFICACION_REGISTRADA_CORRECTAMENTE);
 			datos.put(STATUS, SUCCESS);
 			datos.put(CLASIFICACION, newclasificacion);
-			String json = gson.toJson(datos);
-			return new ResponseEntity<>(json, HttpStatus.CREATED);
+			return new ResponseEntity<>(datos, HttpStatus.CREATED);
 		} catch (Exception e) {
-			throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, MSJ_ERROR_CLASIFICACION_NO_CREADA, e);
+			throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, e.getMessage(), e);
 		}		
 		
 	}
@@ -81,7 +76,7 @@ public class ClasificacionController {
 			datos.put(STATUS, SUCCESS);
 			return new ResponseEntity<>(datos, HttpStatus.CREATED);
 		} catch (Exception e) {
-			throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, MSJ_ERROR_CLASIFICACION_NO_EDITADA, e);			
+			throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, e.getMessage(), e);			
 		}
 		
 	}
@@ -114,7 +109,7 @@ public class ClasificacionController {
 			datos.put(STATUS, SUCCESS);
 			return new ResponseEntity<>(datos, HttpStatus.OK);
 		} catch (Exception e) {
-			throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, MSJ_ERROR_NO_EXISTE_CLASIFICACION, e);
+			throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, e.getMessage(), e);
 		}
 		
 	}
@@ -128,7 +123,7 @@ public class ClasificacionController {
 			datos.put(STATUS, SUCCESS);
 			return new ResponseEntity<>(datos, HttpStatus.OK);
 		} catch (Exception e) {
-			throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, MSJ_ERROR_NO_SE_PUEDE_ELIMINAR_LA_CLASIFICACION, e);
+			throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, e.getMessage(), e);
 		}
 				
 	}

@@ -4,7 +4,6 @@ import java.io.Serializable;
 import java.util.Date;
 import java.util.List;
 
-import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
@@ -12,12 +11,8 @@ import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.OneToMany;
 import javax.persistence.Table;
-import javax.persistence.Temporal;
-import javax.persistence.TemporalType;
 
 import com.fasterxml.jackson.annotation.JsonBackReference;
-import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
-import com.fasterxml.jackson.annotation.JsonManagedReference;
 
 @Entity
 @Table(name= "departamentos")
@@ -42,7 +37,7 @@ public class Departamento implements Serializable{
 	@Column(name="fecharegistro", nullable = false)
 	private Date fechaRegistro;
 	
-	@Column(name="fechaactualiacion", nullable = false)
+	@Column(name="fechaactualizacion", nullable = false)
 	private Date fechaActualizacion;
 	
 	@Column(name = "estado")
@@ -50,7 +45,7 @@ public class Departamento implements Serializable{
 	
 	
 	@OneToMany(mappedBy = "departamento") 	
-	@JsonManagedReference
+	@JsonBackReference
 	private	List<Clasificacion> clasificaciones;
 	 
 

@@ -10,7 +10,6 @@ import java.util.List;
 import org.hibernate.JDBCException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
 
 import com.ac75.springboot.app.manuales.domain.Manual;
 import com.ac75.springboot.app.manuales.repository.IManualRepository;
@@ -26,9 +25,7 @@ public class ManualServiceImpl implements IManualService {
 	private static final String MSJ_TIPO_EXTENSION_DE_ARCHIVO_NO_VALIDO = "Extensión de archivo no válida";
 	private static final String MSJ_TIPO_EXTENSION_DE_VIDEO_NO_VALIDO = "Extensión de video no válida";
 	private static final String MSJ_ERROR_NO_EXISTE_EL_ARCHIVO = "Error, no existe el archivo";
-	String rutaImagen = "C:/xampp/htdocs/manual/imagenes";
-	String rutaArchivo = "C:/xampp/htdocs/manual/archivos";
-	String rutaVideo = "C:/xampp/htdocs/manual/videos";
+	String ruta = "C:/xampp/htdocs/";
 	
 	
 	@Autowired
@@ -38,7 +35,7 @@ public class ManualServiceImpl implements IManualService {
 	private FileUtil fileUtil;
 	
 	@Override
-	public Manual save(Manual manual, byte[] fileImagen, byte[] fileArchivo, byte[] fileVideo) throws Exception {
+	public Manual save(Manual manual, byte[] fileImagen, String nombreImagen, byte[] fileArchivo, String nombreArchivo, byte[] fileVideo) throws Exception {
 							
 		if(manual.getNombre().isEmpty()) {
 			throw new Exception(MSJ_EL_NOMBRE_DEL_MANUAL_ES_REQUERIDO);
@@ -48,11 +45,16 @@ public class ManualServiceImpl implements IManualService {
 			throw new Exception(MSJ_YA_EXISTE_UN_MANUAL_CON_EL_MISMO_NOMBRE);
 		}
 		
-		this.saveArchivos(manual, fileImagen, fileArchivo, fileVideo);
-		
-		
 		Date fecha = new Date();
 		
+		String urlImagen = fecha.getTime()+"-"+nombreImagen;
+		manual.setUrlImagen(urlImagen);
+		String urlArchivo = fecha.getTime()+"-"+nombreArchivo;
+		manual.setUrlArchivo(urlArchivo);
+		
+		this.saveArchivos(manual, fileImagen, fileArchivo, fileVideo);
+		
+					
 		manual.setFechaRegistro(fecha);
 		manual.setFechaActualizacion(fecha);
 		manual.setEstado(true);
@@ -66,20 +68,21 @@ public class ManualServiceImpl implements IManualService {
 		return manual;
 	}
 	
-		
+	
 	private void saveArchivos(Manual manual, byte[] fileImagen, byte[] fileArchivo, byte[] fileVideo) throws Exception {
 				
 		this.validarExtensiones(manual.getUrlImagen(), manual.getUrlArchivo(), manual.getUrlVideo());
 		
-		this.writeFile(fileImagen, this.rutaImagen, manual.getUrlImagen());
-		manual.setUrlImagen(this.rutaImagen+"/"+manual.getUrlImagen());
-			
-		this.writeFile(fileArchivo, this.rutaArchivo, manual.getUrlArchivo());
-		manual.setUrlArchivo(this.rutaArchivo+"/"+manual.getUrlArchivo());
+		manual.setUrlImagen("manuales/imagenes"+"/"+manual.getUrlImagen());
+		this.writeFile(fileImagen, this.ruta, manual.getUrlImagen());
+		
+		manual.setUrlArchivo("manuales/archivos"+"/"+manual.getUrlArchivo());	
+		this.writeFile(fileArchivo, this.ruta, manual.getUrlArchivo());
+		
 		
 		if(fileVideo!=null) {
-			this.writeFile(fileVideo,this.rutaVideo, manual.getUrlVideo());
-			manual.setUrlVideo(this.rutaVideo+"/"+manual.getUrlVideo());
+			manual.setUrlVideo("manuales/videos"+"/"+manual.getUrlVideo());
+			this.writeFile(fileVideo,this.ruta, manual.getUrlVideo());			
 		}	
 		
 	}
@@ -91,7 +94,7 @@ public class ManualServiceImpl implements IManualService {
 		String [] extImagen = urlImagen.split("\\.");
 		tipo = extImagen[extImagen.length-1];
 		
-		if(!tipo.equals("jpg")&&!tipo.equals("png")&&!tipo.equals("gif")) 
+		if(!tipo.equals("jpg")&&!tipo.equals("png")&&!tipo.equals("gif")&&!tipo.equals("jpeg")) 
 			throw new Exception(MSJ_TIPO_EXTENSION_DE_IMAGEN_NO_VALIDO);
 		
 		
@@ -124,7 +127,7 @@ public class ManualServiceImpl implements IManualService {
 	}
 
 	@Override
-	public Manual edit(Manual manual, Long id, byte[] fileImagen, byte[] fileArchivo, byte[] fileVideo) throws Exception {
+	public Manual edit(Manual manual, Long id, byte[] fileImagen, String nombreImagen, byte[] fileArchivo, String nombreArchivo, byte[] fileVideo) throws Exception {
 		
 		Manual manualbd = manualRepository.findById(id).get();
 		
@@ -137,19 +140,21 @@ public class ManualServiceImpl implements IManualService {
 		manualbd.setFechaActualizacion(new Date());
 		manualbd.setNombre(manual.getNombre());
 		manualbd.setDescripcion(manual.getDescripcion());
-		manualbd.setEstado(manual.isEstado());		
+		manualbd.setEstado(manual.isEstado());	
+		manualbd.setClasificacion(manual.getClasificacion());
 		
-		this.validarAndEliminarArchivo(manualbd.getUrlImagen(), this.rutaImagen+"/"+manual.getUrlImagen());
+		this.validarAndEliminarArchivo(manualbd.getUrlImagen(), "manuales/imagenes"+"/"+nombreImagen);
 		
-		this.validarAndEliminarArchivo(manualbd.getUrlArchivo(), this.rutaArchivo+"/"+manual.getUrlArchivo());
+		this.validarAndEliminarArchivo(manualbd.getUrlArchivo(), "manuales/archivos"+"/"+nombreArchivo);
 		
-		this.validarAndEliminarArchivo(manualbd.getUrlVideo(), this.rutaVideo+"/"+manual.getUrlVideo());
+		//this.validarAndEliminarArchivo(manualbd.getUrlVideo(), manual.getUrlVideo());
 		
 		this.saveArchivos(manual, fileImagen, fileArchivo, fileVideo);
 		
-		manual.setIdManual(id);
+		manualbd.setUrlImagen(manual.getUrlImagen());
+		manualbd.setUrlArchivo(manual.getUrlArchivo());
 		
-		return manualRepository.save(manual);
+		return manualRepository.save(manualbd);
 	}
 	
 	private void validarAndEliminarArchivo(String urlAnterior, String urlNueva){
@@ -198,7 +203,21 @@ public class ManualServiceImpl implements IManualService {
 		if(!manualRepository.existsById(id))
 			throw new Exception(MSJ_EL_MANUAL_NO_EXISTE);
 		
+		
 		manualRepository.deleteById(id);	
+	}
+
+
+	@Override
+	public List<Manual> getAllActiveManuales() {
+		return manualRepository.findAllActiveManuales();
+	}
+
+
+	@Override
+	public Manual edit(Manual manual, Long id, byte[] fileImagen, String nombreArchivo) {
+		
+		return null;
 	}
 		
 

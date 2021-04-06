@@ -23,7 +23,6 @@ import org.springframework.web.server.ResponseStatusException;
 import com.ac75.springboot.app.manuales.domain.Manual;
 import com.ac75.springboot.app.manuales.service.IManualService;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.google.gson.Gson;
 
 
 @CrossOrigin(origins = "*", methods = { RequestMethod.POST, RequestMethod.GET, RequestMethod.DELETE,RequestMethod.PUT })
@@ -31,7 +30,6 @@ import com.google.gson.Gson;
 @RequestMapping("/manual")
 public class ManualController {
 
-	private static final String MSJ_ERROR_MANUAL_NO_CREADO = "Error, manual no creado";
 	private static final String MSJ_MANUAL_EDITADO_CORRECTAMENTE = "Manual editado correctamente";  
 	private static final String MSJ_MANUAL_REGISTRADO_CORRECTAMENTE = "Manual registrado correctamente";
 	private static final String MSJ_ERROR_CONEXION_PERDIDA = "Se perdió la conexión";
@@ -50,35 +48,33 @@ public class ManualController {
 	
 	
 	@PostMapping(path = "registrarManual")
-	public ResponseEntity<Object> saveManual(@RequestParam String manual, @RequestParam MultipartFile fileImagen, @RequestParam MultipartFile fileArchivo, @RequestParam MultipartFile fileVideo) throws Exception{
+	public ResponseEntity<Object> saveManual(@RequestParam String manual, @RequestParam MultipartFile fileImagen, @RequestParam MultipartFile fileArchivo/*, @RequestParam MultipartFile fileVideo*/) throws Exception{
 		
 		ObjectMapper newMapper= new ObjectMapper();
 		Manual objManual=newMapper.readValue(manual, Manual.class);
 		
 		HashMap<String, Object> datos = new HashMap<>();
-		Gson gson = new Gson();
 		
 		byte[] byteFileVideo=null;
 		
-		if(!fileVideo.isEmpty()) {
+		/*if(!fileVideo.isEmpty()) {
 			byteFileVideo=fileVideo.getBytes();
-		}
+		}*/
 				
 		try {
-			Manual newManual = manualService.save(objManual, fileImagen.getBytes(), fileArchivo.getBytes(), byteFileVideo); 
+			Manual newManual = manualService.save(objManual, fileImagen.getBytes(), fileImagen.getOriginalFilename(), fileArchivo.getBytes(), fileArchivo.getOriginalFilename(), byteFileVideo); 
 			datos.put(MSJ, MSJ_MANUAL_REGISTRADO_CORRECTAMENTE);
 			datos.put(STATUS, SUCCESS);
 			datos.put(MANUAL, newManual);
-			String json = gson.toJson(datos);
-			return new ResponseEntity<>(json, HttpStatus.CREATED);
+			return new ResponseEntity<>(datos, HttpStatus.CREATED);
 		} catch (Exception e) {
-			throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, MSJ_ERROR_MANUAL_NO_CREADO, e);
+			throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, e.getMessage(), e);
 		}
 		
 	}
 	
 	@PutMapping(path = "editarManual/{id}")
-	public ResponseEntity<Object> editarManual(@RequestParam String manual, @RequestParam MultipartFile fileImagen, @RequestParam MultipartFile fileArchivo, @RequestParam MultipartFile fileVideo, @PathVariable Long id) throws Exception{
+	public ResponseEntity<Object> editarManual(@RequestParam String manual, @RequestParam MultipartFile fileImagen, @RequestParam MultipartFile fileArchivo, /*@RequestParam MultipartFile fileVideo,*/ @PathVariable Long id) throws Exception{
 		
 		ObjectMapper newMapper= new ObjectMapper();
 		Manual objManual=newMapper.readValue(manual, Manual.class);
@@ -87,23 +83,23 @@ public class ManualController {
 		
 		byte[] byteFileVideo=null;
 		
-		if(!fileVideo.isEmpty()) {
+		/*if(!fileVideo.isEmpty()) {
 			byteFileVideo=fileVideo.getBytes();
-		}
+		}*/
 		
 		
 		try {
-			Manual newManual = manualService.edit(objManual, id, fileImagen.getBytes(), fileArchivo.getBytes(), byteFileVideo); 
+			Manual newManual = manualService.edit(objManual, id, fileImagen.getBytes(), fileImagen.getOriginalFilename(), fileArchivo.getBytes(), fileArchivo.getOriginalFilename(), byteFileVideo); 
 			datos.put(MSJ, MSJ_MANUAL_EDITADO_CORRECTAMENTE);
 			datos.put(STATUS, SUCCESS);
 			datos.put(MANUAL, newManual);
 			return new ResponseEntity<>(datos, HttpStatus.CREATED);
 		} catch (Exception e) {
-			throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, MSJ_ERROR_MANUAL_NO_CREADO, e);
+			throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, e.getMessage(), e);
 		}
 		
 	}
-	
+		
 	@GetMapping(path = "obtenerManuales")
 	public ResponseEntity<Object> getAllManuales(HttpServletRequest httpServletRequest){
 		HashMap<String, Object> datos = new HashMap<>();
@@ -145,6 +141,11 @@ public class ManualController {
 			throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, MSJ_ERROR_NO_SE_PUEDE_ELIMINAR_EL_MANUAL, e);
 		}
 				
+	}
+	
+	@GetMapping("listarManualesActivos")
+	public ResponseEntity<Object> getAllActiveManuales(){
+		return new ResponseEntity<>(manualService.getAllActiveManuales(), HttpStatus.OK);
 	}
 	
 	

@@ -11,10 +11,6 @@ import javax.persistence.Id;
 import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
 import javax.persistence.Table;
-import javax.persistence.Temporal;
-import javax.persistence.TemporalType;
-
-import com.fasterxml.jackson.annotation.JsonBackReference;
 
 @Entity
 @Table(name="manuales")
@@ -40,7 +36,7 @@ public class Manual implements Serializable{
 	@Column(name="fecharegistro", nullable = false)
 	private Date fechaRegistro;
 	
-	@Column(name="fechaactualiacion", nullable = false)
+	@Column(name="fechaactualizacion", nullable = false)
 	private Date fechaActualizacion;
 	
 	@Column(name = "estado")
@@ -56,8 +52,7 @@ public class Manual implements Serializable{
 	private String urlVideo;
 	
 	@ManyToOne	  
-	@JoinColumn(name = "FK_CLASIFICACION", nullable = false, updatable = false)
-	@JsonBackReference
+	@JoinColumn(name = "FK_CLASIFICACION", nullable = false, updatable = true)	
 	private Clasificacion clasificacion;
 		
 	public Long getIdManual() {

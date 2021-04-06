@@ -32,11 +32,8 @@ public class DepartamentoController {
 	private static final String MSJ_DEPARTAMENTO_ACTUALIZADO_CORRECTAMENTE = "Departamento actualizado correctamente";
 	private static final String MSJ_DEPARTAMENTO_REGISTRADO_CORRECTAMENTE = "Departamento registrado correctamente";
 	private static final String MSJ_SE_HA_ELIMINADO_EL_DEPARTAMENTO_CON_IDENTIFICADOR = "Se ha eliminado el departamento con identificador: ";
-	private static final String MSJ_ERROR_DEPARTAMENTO_NO_CREADO = "Error, departamento no creado";
-	private static final String MSJ_ERROR_DEPARTAMENTO_NO_EDITADO = "Error, departamento no editado";
 	private static final String MSJ_ERROR_CONEXION_PERDIDA = "Error, conexion perdida";
 	private static final String MSJ_ERROR_NO_EXISTE_EL_DEPARTAMENTO = "Error, no existe el departamento";
-	private static final String MSJ_ERROR_NO_SE_PUEDE_ELIMINAR_EL_DEPARTAMENTO = "Error, no se pudo eliminar el departamento";
 	private static final String MSJ_LISTA_DE_DEPARTAMENTOS = "Lista de departamentos";
 	private static final String DEPARTAMENTO = "Departamento";
 	private static final String MSJ = "msj";
@@ -62,7 +59,7 @@ public class DepartamentoController {
 			String json = gson.toJson(datos);
 			return new ResponseEntity<>(json, HttpStatus.CREATED);
 		} catch (Exception e) {
-			throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, MSJ_ERROR_DEPARTAMENTO_NO_CREADO, e);
+			throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, e.getMessage(), e);
 		}
 
 	}
@@ -78,7 +75,7 @@ public class DepartamentoController {
 			datos.put(STATUS, SUCCESS);
 			return new ResponseEntity<>(datos, HttpStatus.CREATED);
 		} catch (Exception e) {
-			throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, MSJ_ERROR_DEPARTAMENTO_NO_EDITADO, e);			
+			throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, e.getMessage(), e);			
 		}
 		
 	}
@@ -126,8 +123,15 @@ public class DepartamentoController {
 			datos.put(STATUS, SUCCESS);
 			return new ResponseEntity<>(datos, HttpStatus.OK);
 		} catch (Exception e) {
-			throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, MSJ_ERROR_NO_SE_PUEDE_ELIMINAR_EL_DEPARTAMENTO, e);
+			throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, e.getMessage(), e);
 		}
 				
+	}
+	
+	@GetMapping("listarClasificacionesByIdDepartamento/{id}")
+	public ResponseEntity<Object> listarClasificacionesByIdDepartamento(@PathVariable Long id){
+		
+		return new ResponseEntity<>(departamentoService.getClasificacionesByIdDepartamento(id), HttpStatus.OK);
+		
 	}
 }

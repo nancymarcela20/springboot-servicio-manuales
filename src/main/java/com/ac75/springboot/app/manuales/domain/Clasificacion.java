@@ -4,10 +4,8 @@ import java.io.Serializable;
 import java.util.Date;
 import java.util.List;
 
-import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.Entity;
-import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
@@ -17,8 +15,6 @@ import javax.persistence.OneToMany;
 import javax.persistence.Table;
 
 import com.fasterxml.jackson.annotation.JsonBackReference;
-import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
-import com.fasterxml.jackson.annotation.JsonManagedReference;
 
 @Entity
 @Table(name="clasificaciones")
@@ -43,19 +39,18 @@ public class Clasificacion implements Serializable{
 	@Column(name="fecharegistro")
 	private Date fechaRegistro;
 	
-	@Column(name="fechaactualiacion")
+	@Column(name="fechaactualizacion")
 	private Date fechaActualizacion;
 	
 	@Column(name = "estado")
 	private boolean estado;
 	
 	@OneToMany(mappedBy = "clasificacion")
-	@JsonManagedReference
+	@JsonBackReference
 	private List<Manual> manuales;
 	
 	@ManyToOne()
-	@JoinColumn(name = "FK_DEPARTAMENTO", nullable = false, updatable = false)	
-	@JsonBackReference
+	@JoinColumn(name = "FK_DEPARTAMENTO", nullable = false, updatable = true)		
 	private Departamento departamento;
 
 	public Long getIdClasificacion() {

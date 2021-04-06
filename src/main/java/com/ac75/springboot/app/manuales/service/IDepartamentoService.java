@@ -2,6 +2,7 @@ package com.ac75.springboot.app.manuales.service;
 
 import java.util.List;
 
+import com.ac75.springboot.app.manuales.domain.Clasificacion;
 import com.ac75.springboot.app.manuales.domain.Departamento;
 
 public interface IDepartamentoService {
@@ -15,4 +16,6 @@ public interface IDepartamentoService {
 	Departamento getDepartamentoById(Long id) throws Exception;
 	
 	void delete(Long id) throws Exception;
+	
+	List<Clasificacion> getClasificacionesByIdDepartamento(Long id);
 }

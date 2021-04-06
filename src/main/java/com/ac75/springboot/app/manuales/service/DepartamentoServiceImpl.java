@@ -7,6 +7,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import com.ac75.springboot.app.manuales.domain.Clasificacion;
 import com.ac75.springboot.app.manuales.domain.Departamento;
 import com.ac75.springboot.app.manuales.repository.IDepartamentoRepository;
 
@@ -17,6 +18,7 @@ public class DepartamentoServiceImpl implements IDepartamentoService {
 	private static final String MSJ_EL_CODIGO_DEL_DEPARTAMENTO_ES_REQUERIDO = "El código del departamento es requerido";	
 	private static final String MSJ_EL_DEPARTAMENTO_NO_EXISTE = "El departamento no existe";
 	private static final String YA_EXISTE_UN_DEPARTAMENTO_REGISTRADO_CON_ESTE_CODIGO = "Ya existe un departamento creado con este código";
+	private static final String EL_DEPARTAMENTO_NO_SE_PUEDE_ELIMINAR = "El departamento no se puede eliminar porque tiene clasificaciones asociadas: "; 
 	
 	@Autowired
 	private IDepartamentoRepository departamentoRepository;
@@ -88,10 +90,41 @@ public class DepartamentoServiceImpl implements IDepartamentoService {
 	@Transactional
 	public void delete(Long id) throws Exception {
 		
-		if(!departamentoRepository.existsById(id))
+		Departamento departamento = departamentoRepository.findById(id).get();
+		
+		if(departamento == null)
 			throw new Exception(MSJ_EL_DEPARTAMENTO_NO_EXISTE);
 		
+		List<Clasificacion> clasificaciones = departamento.getClasificaciones();
+		
+		if(!clasificaciones.isEmpty()) {
+			throw new Exception(EL_DEPARTAMENTO_NO_SE_PUEDE_ELIMINAR
+								+listarClasificaciones(clasificaciones).replace(",", " "));
+		}
+		
 		departamentoRepository.deleteById(id);	
+	}
+	
+	private String listarClasificaciones(List<Clasificacion> clasificaciones) {
+		
+		String datos = "";
+		
+		for(Clasificacion c: clasificaciones) {
+			datos+= c.getNombre()+",";
+		}
+		
+		return datos;
+		
+	}
+
+	@Override
+	public List<Clasificacion> getClasificacionesByIdDepartamento(Long id) {
+		
+		Departamento departamento = departamentoRepository.findById(id).get();
+		
+		List<Clasificacion> clasificaciones = departamento.getClasificaciones();
+		
+		return clasificaciones;
 	}
 
 }
