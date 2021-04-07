@@ -32,9 +32,7 @@ public class ClasificacionController {
 	private static final String MSJ_CLASIFICACION_ACTUALIZADA_CORRECTAMENTE = "Clasificación actualizada correctamente";
 	private static final String MSJ_CLASIFICACION_REGISTRADA_CORRECTAMENTE = "Clasificación registrada correctamente";
 	private static final String MSJ_ELIMINACION = "Se ha eliminado la clasificación con identificador: ";
-	private static final String MSJ_ERROR_CLASIFICACION_NO_EDITADA = "Error, clasificación no editada";
 	private static final String MSJ_ERROR_CONEXION_PERDIDA = "Error, conexión perdida";
-	private static final String MSJ_ERROR_NO_EXISTE_CLASIFICACION = "Error, no existe la clasificación";
 	private static final String CLASIFICACION = "Clasificacion";
 	private static final String CLASIFICACIONES = "Clasificaciones";
 	private static final String LISTA_DE_CLASIFICACIONES = "Lista de clasificaciones";

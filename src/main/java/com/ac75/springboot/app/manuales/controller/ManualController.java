@@ -74,22 +74,32 @@ public class ManualController {
 	}
 	
 	@PutMapping(path = "editarManual/{id}")
-	public ResponseEntity<Object> editarManual(@RequestParam String manual, @RequestParam MultipartFile fileImagen, @RequestParam MultipartFile fileArchivo, /*@RequestParam MultipartFile fileVideo,*/ @PathVariable Long id) throws Exception{
+	public ResponseEntity<Object> editarManual(@RequestParam String manual, @RequestParam(required = false) MultipartFile fileImagen, @RequestParam(required = false) MultipartFile fileArchivo, /*@RequestParam MultipartFile fileVideo,*/ @PathVariable Long id) throws Exception{
 		
 		ObjectMapper newMapper= new ObjectMapper();
 		Manual objManual=newMapper.readValue(manual, Manual.class);
 		
 		HashMap<String, Object> datos = new HashMap<>();
 		
-		byte[] byteFileVideo=null;
+		byte[] byteFileVideo=null, byteFileImagen=null, byteFileArchivo=null;
+		String nombreImagen=null, nombreArchivo=null;
 		
 		/*if(!fileVideo.isEmpty()) {
 			byteFileVideo=fileVideo.getBytes();
 		}*/
 		
+		if(!fileImagen.isEmpty()) {
+			byteFileImagen = fileImagen.getBytes();
+			nombreImagen = fileImagen.getOriginalFilename();
+		}
+		
+		if(!fileArchivo.isEmpty()) {
+			byteFileArchivo = fileArchivo.getBytes();
+			nombreArchivo = fileArchivo.getOriginalFilename();
+		}
 		
 		try {
-			Manual newManual = manualService.edit(objManual, id, fileImagen.getBytes(), fileImagen.getOriginalFilename(), fileArchivo.getBytes(), fileArchivo.getOriginalFilename(), byteFileVideo); 
+			Manual newManual = manualService.edit(objManual, id, byteFileImagen, nombreImagen, byteFileArchivo, nombreArchivo, byteFileVideo); 
 			datos.put(MSJ, MSJ_MANUAL_EDITADO_CORRECTAMENTE);
 			datos.put(STATUS, SUCCESS);
 			datos.put(MANUAL, newManual);

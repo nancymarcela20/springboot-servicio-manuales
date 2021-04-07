@@ -10,8 +10,6 @@ public interface IManualService {
 	
 	Manual edit(Manual manual, Long id, byte[] fileImagen, String nombreImagen, byte[] fileArchivo, String nombreArchivo, byte[] fileVideo) throws Exception;
 	
-	Manual edit(Manual manual, Long id, byte[] fileImagen, String nombreArchivo);
-	
 	List<Manual> getAllManuales();
 	
 	Manual getManualById(Long id) throws Exception;

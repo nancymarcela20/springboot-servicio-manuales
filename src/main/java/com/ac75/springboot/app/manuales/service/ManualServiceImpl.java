@@ -24,8 +24,12 @@ public class ManualServiceImpl implements IManualService {
 	private static final String MSJ_TIPO_EXTENSION_DE_IMAGEN_NO_VALIDO = "Extensión de imagen no válida";
 	private static final String MSJ_TIPO_EXTENSION_DE_ARCHIVO_NO_VALIDO = "Extensión de archivo no válida";
 	private static final String MSJ_TIPO_EXTENSION_DE_VIDEO_NO_VALIDO = "Extensión de video no válida";
-	private static final String MSJ_ERROR_NO_EXISTE_EL_ARCHIVO = "Error, no existe el archivo";
+	private static final String MSJ_ERROR_LA_IMAGEN_NO_EXISTE_EN_LA_RUTA_INDICADA = "Error, la imagen no existe en la ruta indicada";
+	private static final String MSJ_ERROR_EL_ARCHIVO_NO_EXISTE_EN_LA_RUTA_INDICADA = "Error, el archivo no existe en la ruta indicada";
+	private static final String MANUALES_IMAGENES = "manuales/imagenes";
+	private static final String MANUALES_ARCHIVOS = "manuales/archivos";
 	String ruta = "C:/xampp/htdocs/";
+	
 	
 	
 	@Autowired
@@ -73,10 +77,10 @@ public class ManualServiceImpl implements IManualService {
 				
 		this.validarExtensiones(manual.getUrlImagen(), manual.getUrlArchivo(), manual.getUrlVideo());
 		
-		manual.setUrlImagen("manuales/imagenes"+"/"+manual.getUrlImagen());
+		manual.setUrlImagen(MANUALES_IMAGENES+"/"+manual.getUrlImagen());
 		this.writeFile(fileImagen, this.ruta, manual.getUrlImagen());
 		
-		manual.setUrlArchivo("manuales/archivos"+"/"+manual.getUrlArchivo());	
+		manual.setUrlArchivo(MANUALES_ARCHIVOS+"/"+manual.getUrlArchivo());	
 		this.writeFile(fileArchivo, this.ruta, manual.getUrlArchivo());
 		
 		
@@ -130,6 +134,7 @@ public class ManualServiceImpl implements IManualService {
 	public Manual edit(Manual manual, Long id, byte[] fileImagen, String nombreImagen, byte[] fileArchivo, String nombreArchivo, byte[] fileVideo) throws Exception {
 		
 		Manual manualbd = manualRepository.findById(id).get();
+		boolean sw=false;
 		
 		if(manualbd==null)
 			throw new Exception(MSJ_EL_MANUAL_NO_EXISTE);
@@ -137,39 +142,37 @@ public class ManualServiceImpl implements IManualService {
 		if(manual.getNombre().isEmpty())
 			throw new Exception(MSJ_EL_NOMBRE_DEL_MANUAL_ES_REQUERIDO);
 		
-		manualbd.setFechaActualizacion(new Date());
+		Date fecha = new Date();
+		
+		manualbd.setFechaActualizacion(fecha);
 		manualbd.setNombre(manual.getNombre());
 		manualbd.setDescripcion(manual.getDescripcion());
 		manualbd.setEstado(manual.isEstado());	
 		manualbd.setClasificacion(manual.getClasificacion());
 		
-		this.validarAndEliminarArchivo(manualbd.getUrlImagen(), "manuales/imagenes"+"/"+nombreImagen);
+		if(fileImagen!=null) {
+			sw = this.deleteFile(this.ruta+manualbd.getUrlImagen());
+			if(!sw)
+				throw new Exception(MSJ_ERROR_LA_IMAGEN_NO_EXISTE_EN_LA_RUTA_INDICADA);
+			nombreImagen = MANUALES_IMAGENES+"/"+fecha.getTime()+"-"+nombreImagen;
+			manualbd.setUrlImagen(nombreImagen);
+			this.writeFile(fileImagen, this.ruta, nombreImagen);
+		}
 		
-		this.validarAndEliminarArchivo(manualbd.getUrlArchivo(), "manuales/archivos"+"/"+nombreArchivo);
+		if(fileArchivo!=null) {
+			sw = this.deleteFile(this.ruta+manualbd.getUrlArchivo());
+			if(!sw)
+				throw new Exception(MSJ_ERROR_EL_ARCHIVO_NO_EXISTE_EN_LA_RUTA_INDICADA);
+			nombreArchivo = MANUALES_ARCHIVOS+"/"+fecha.getTime()+"-"+nombreArchivo;
+			manualbd.setUrlArchivo(nombreArchivo);
+			this.writeFile(fileArchivo, this.ruta, nombreArchivo);
+		}
 		
 		//this.validarAndEliminarArchivo(manualbd.getUrlVideo(), manual.getUrlVideo());
-		
-		this.saveArchivos(manual, fileImagen, fileArchivo, fileVideo);
-		
-		manualbd.setUrlImagen(manual.getUrlImagen());
-		manualbd.setUrlArchivo(manual.getUrlArchivo());
-		
+				
 		return manualRepository.save(manualbd);
 	}
 	
-	private void validarAndEliminarArchivo(String urlAnterior, String urlNueva){
-		
-		boolean sw = false;
-		
-		if(!urlAnterior.equals(urlNueva)) 
-			sw = this.deleteFile(urlAnterior); 
-				
-		if(!sw)
-			throw new RuntimeException(MSJ_ERROR_NO_EXISTE_EL_ARCHIVO);
-			
-		
-	}
-
 	private boolean deleteFile(String ruta) {
 		
 		Path url = Paths.get(ruta);		
@@ -200,9 +203,21 @@ public class ManualServiceImpl implements IManualService {
 
 	@Override
 	public void delete(Long id) throws Exception {
-		if(!manualRepository.existsById(id))
+		boolean sw = false;
+		Manual manual = manualRepository.findById(id).get();
+		
+		if(manual == null)
 			throw new Exception(MSJ_EL_MANUAL_NO_EXISTE);
 		
+		sw = this.deleteFile(this.ruta+manual.getUrlImagen());
+		
+		if(!sw)
+			throw new Exception(MSJ_ERROR_LA_IMAGEN_NO_EXISTE_EN_LA_RUTA_INDICADA);
+		
+		sw = this.deleteFile(this.ruta+manual.getUrlArchivo());
+		
+		if(!sw)
+			throw new Exception(MSJ_ERROR_EL_ARCHIVO_NO_EXISTE_EN_LA_RUTA_INDICADA);
 		
 		manualRepository.deleteById(id);	
 	}
@@ -213,12 +228,5 @@ public class ManualServiceImpl implements IManualService {
 		return manualRepository.findAllActiveManuales();
 	}
 
-
-	@Override
-	public Manual edit(Manual manual, Long id, byte[] fileImagen, String nombreArchivo) {
-		
-		return null;
-	}
-		
 
 }

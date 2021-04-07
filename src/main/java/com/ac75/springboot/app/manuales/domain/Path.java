@@ -21,9 +21,9 @@ public class Path implements Serializable{
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	private Long id;
-	@Column(name="nombre", unique = true, nullable = false, length = 100)
+	@Column(name="nombre", nullable = false, length = 100)
 	private String nombre;
-	@Column(name="ruta", unique = true, nullable = false, length = 200)
+	@Column(name="ruta", nullable = false, length = 200)
 	private String ruta;
 	public Long getId() {
 		return id;
