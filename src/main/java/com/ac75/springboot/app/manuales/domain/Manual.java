@@ -33,6 +33,9 @@ public class Manual implements Serializable{
 	@Column(name="descripcion", length = 200)	
 	private String descripcion;
 	
+	@Column(name="tipoinformacion", nullable = false, length = 30)
+	private String tipoInformacion;
+	
 	@Column(name="fecharegistro", nullable = false)
 	private Date fechaRegistro;
 	
@@ -77,6 +80,14 @@ public class Manual implements Serializable{
 
 	public void setDescripcion(String descripcion) {
 		this.descripcion = descripcion;
+	}
+
+	public String getTipoInformacion() {
+		return tipoInformacion;
+	}
+
+	public void setTipoInformacion(String tipoInformacion) {
+		this.tipoInformacion = tipoInformacion;
 	}
 
 	public Date getFechaRegistro() {

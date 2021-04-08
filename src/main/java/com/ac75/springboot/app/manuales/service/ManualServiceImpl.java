@@ -4,13 +4,16 @@ import java.io.IOException;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.sql.SQLException;
+import java.util.Arrays;
 import java.util.Date;
 import java.util.List;
+import java.util.Optional;
 
 import org.hibernate.JDBCException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import com.ac75.springboot.app.manuales.constant.TipoInformacion;
 import com.ac75.springboot.app.manuales.domain.Manual;
 import com.ac75.springboot.app.manuales.repository.IManualRepository;
 import com.ac75.springboot.app.manuales.util.FileUtil;
@@ -26,6 +29,7 @@ public class ManualServiceImpl implements IManualService {
 	private static final String MSJ_TIPO_EXTENSION_DE_VIDEO_NO_VALIDO = "Extensión de video no válida";
 	private static final String MSJ_ERROR_LA_IMAGEN_NO_EXISTE_EN_LA_RUTA_INDICADA = "Error, la imagen no existe en la ruta indicada";
 	private static final String MSJ_ERROR_EL_ARCHIVO_NO_EXISTE_EN_LA_RUTA_INDICADA = "Error, el archivo no existe en la ruta indicada";
+	private static final String MSJ_TIPO_DE_INFORMACION_NO_VAALIDO = "El tipo de información no es válido";
 	private static final String MANUALES_IMAGENES = "manuales/imagenes";
 	private static final String MANUALES_ARCHIVOS = "manuales/archivos";
 	String ruta = "C:/xampp/htdocs/";
@@ -54,6 +58,7 @@ public class ManualServiceImpl implements IManualService {
 		manual.setUrlImagen(urlImagen);
 		String urlArchivo = fecha.getTime()+"-"+nombreArchivo;
 		manual.setUrlArchivo(urlArchivo);
+		validarValido(manual.getTipoInformacion(), TipoInformacion.class, MSJ_TIPO_DE_INFORMACION_NO_VAALIDO);
 		
 		this.saveArchivos(manual, fileImagen, fileArchivo, fileVideo);
 		
@@ -71,6 +76,20 @@ public class ManualServiceImpl implements IManualService {
 		return manual;
 	}
 	
+	private static <E extends Enum<E>> E validarValido(String valor, Class<E> enumAObtener, String mensaje) throws Exception {
+        E enumObtenido = null;
+        if(valor != null) {
+            Optional<E> resultadoOpcional = Arrays.stream(enumAObtener.getEnumConstants())
+                    .filter(resultado -> resultado.toString().equals(valor)).findFirst();
+
+            if (resultadoOpcional.isPresent()) {
+                enumObtenido = resultadoOpcional.get();
+            } else {
+                throw new Exception(MSJ_TIPO_DE_INFORMACION_NO_VAALIDO);
+            }
+        }
+        return enumObtenido;
+    }
 	
 	private void saveArchivos(Manual manual, byte[] fileImagen, byte[] fileArchivo, byte[] fileVideo) throws Exception {
 				
