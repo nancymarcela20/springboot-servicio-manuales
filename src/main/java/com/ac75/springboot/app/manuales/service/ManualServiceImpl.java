@@ -21,15 +21,14 @@ public class ManualServiceImpl implements IManualService {
 	private static final String MSJ_YA_EXISTE_UN_MANUAL_CON_EL_MISMO_NOMBRE = "Ya existe un manual con el mismo nombre";
 	private static final String MSJ_EL_NOMBRE_DEL_MANUAL_ES_REQUERIDO = "El nombre del manual es requerido";
 	private static final String MSJ_EL_MANUAL_NO_EXISTE = "No existe un manual con el identificado indicado";
-	private static final String MSJ_TIPO_EXTENSION_DE_IMAGEN_NO_VALIDO = "Extensión de imagen no válida";
-	private static final String MSJ_TIPO_EXTENSION_DE_ARCHIVO_NO_VALIDO = "Extensión de archivo no válida";
+	private static final String MSJ_TIPO_EXTENSION_DE_IMAGEN_NO_VALIDO = "La extensión de la imagen no es válida";
+	private static final String MSJ_TIPO_EXTENSION_DE_ARCHIVO_NO_VALIDO = "La extensión del archivo no es válida";
 	private static final String MSJ_TIPO_EXTENSION_DE_VIDEO_NO_VALIDO = "Extensión de video no válida";
 	private static final String MSJ_ERROR_LA_IMAGEN_NO_EXISTE_EN_LA_RUTA_INDICADA = "Error, la imagen no existe en la ruta indicada";
 	private static final String MSJ_ERROR_EL_ARCHIVO_NO_EXISTE_EN_LA_RUTA_INDICADA = "Error, el archivo no existe en la ruta indicada";
 	private static final String MANUALES_IMAGENES = "manuales/imagenes";
 	private static final String MANUALES_ARCHIVOS = "manuales/archivos";
 	String ruta = "C:/xampp/htdocs/";
-	
 	
 	
 	@Autowired
@@ -151,15 +150,22 @@ public class ManualServiceImpl implements IManualService {
 		manualbd.setClasificacion(manual.getClasificacion());
 		
 		if(fileImagen!=null) {
+			String nombreImagen2 = "";
+			this.validarExtensionImagen(nombreImagen);;
+			
 			sw = this.deleteFile(this.ruta+manualbd.getUrlImagen());
 			if(!sw)
 				throw new Exception(MSJ_ERROR_LA_IMAGEN_NO_EXISTE_EN_LA_RUTA_INDICADA);
-			nombreImagen = MANUALES_IMAGENES+"/"+fecha.getTime()+"-"+nombreImagen;
-			manualbd.setUrlImagen(nombreImagen);
-			this.writeFile(fileImagen, this.ruta, nombreImagen);
+			nombreImagen2 = MANUALES_IMAGENES+"/"+fecha.getTime()+"-"+nombreImagen;
+			
+			manualbd.setUrlImagen(nombreImagen2);
+			this.writeFile(fileImagen, this.ruta, nombreImagen2);
 		}
 		
 		if(fileArchivo!=null) {
+			
+			this.validarExtensionArchivo(nombreArchivo);
+			
 			sw = this.deleteFile(this.ruta+manualbd.getUrlArchivo());
 			if(!sw)
 				throw new Exception(MSJ_ERROR_EL_ARCHIVO_NO_EXISTE_EN_LA_RUTA_INDICADA);
@@ -171,6 +177,28 @@ public class ManualServiceImpl implements IManualService {
 		//this.validarAndEliminarArchivo(manualbd.getUrlVideo(), manual.getUrlVideo());
 				
 		return manualRepository.save(manualbd);
+	}
+	
+	private void validarExtensionImagen(String nombreImagen) throws Exception {
+		
+		String tipo="";
+		
+		String [] extImagen = nombreImagen.split("\\.");
+		tipo = extImagen[extImagen.length-1];
+		
+		if(!tipo.equals("jpg")&&!tipo.equals("png")&&!tipo.equals("gif")&&!tipo.equals("jpeg")) 
+			throw new Exception(MSJ_TIPO_EXTENSION_DE_IMAGEN_NO_VALIDO);
+		
+	}
+	
+	private void validarExtensionArchivo(String nombreArchivo) throws Exception {
+		
+		String tipo = " ";
+		String [] extArchivo = nombreArchivo.split("\\.");
+		tipo = extArchivo[extArchivo.length-1];
+		
+		if(!tipo.equals("pdf")&&!tipo.equals("PDF")) 
+			throw new Exception(MSJ_TIPO_EXTENSION_DE_ARCHIVO_NO_VALIDO);
 	}
 	
 	private boolean deleteFile(String ruta) {

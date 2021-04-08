@@ -100,5 +100,10 @@ public class ClasificacionServiceImpl implements IClasificacionService {
 		return clasificacion;
 	}
 
+	@Override
+	public List<Clasificacion> getAllActiveClasificacion() {
+		return clasificacionRepository.findAllActiveClasificacion();
+	}
+
 
 }

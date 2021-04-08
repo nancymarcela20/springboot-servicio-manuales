@@ -16,4 +16,6 @@ public interface IClasificacionService {
 	Clasificacion getClasificacionById(Long id) throws Exception;
 	
 	void delete(Long id) throws Exception;
+	
+	List<Clasificacion> getAllActiveClasificacion();
 }

@@ -134,4 +134,10 @@ public class DepartamentoController {
 		return new ResponseEntity<>(departamentoService.getClasificacionesByIdDepartamento(id), HttpStatus.OK);
 		
 	}
+	
+	@GetMapping("listarDepartamentosActivos")
+	public ResponseEntity<Object> getAllActiveManuales(){
+		return new ResponseEntity<>(departamentoService.getAllActiveDepartamentos(), HttpStatus.OK);
+	}
+	
 }

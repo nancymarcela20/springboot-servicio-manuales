@@ -18,4 +18,7 @@ public interface IDepartamentoService {
 	void delete(Long id) throws Exception;
 	
 	List<Clasificacion> getClasificacionesByIdDepartamento(Long id);
+	
+	List<Departamento> getAllActiveDepartamentos();
+	
 }

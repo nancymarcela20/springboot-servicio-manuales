@@ -126,4 +126,9 @@ public class ClasificacionController {
 				
 	}
 	
+	@GetMapping("listarClasificacionesActivas")
+	public ResponseEntity<Object> getAllActiveClasificaciones(){
+		return new ResponseEntity<>(clasificacionService.getAllActiveClasificacion(), HttpStatus.OK);
+	}
+	
 }

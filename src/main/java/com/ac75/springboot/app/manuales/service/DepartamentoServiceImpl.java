@@ -67,9 +67,19 @@ public class DepartamentoServiceImpl implements IDepartamentoService {
 		departamentobd.setFechaActualizacion(new Date());
 		departamentobd.setNombre(departamento.getNombre());
 		departamentobd.setCodigo(departamento.getCodigo());
-		departamentobd.setEstado(departamento.isEstado());
 		
+		if(departamentobd.isEstado()!=departamento.isEstado()) {
+			departamentobd.setEstado(departamento.isEstado());
+			this.cambiarEstadoClasificacion(departamentobd, departamento.isEstado());
+		}
 		return departamentoRepository.save(departamentobd);
+	}
+	
+	private void cambiarEstadoClasificacion(Departamento departamento, boolean estado) {
+		List<Clasificacion> clasificaciones = departamento.getClasificaciones();
+		for(Clasificacion c: clasificaciones) {
+			c.setEstado(estado);
+		}
 	}
 
 	@Override
@@ -125,6 +135,11 @@ public class DepartamentoServiceImpl implements IDepartamentoService {
 		List<Clasificacion> clasificaciones = departamento.getClasificaciones();
 		
 		return clasificaciones;
+	}
+
+	@Override
+	public List<Departamento> getAllActiveDepartamentos() {
+		return departamentoRepository.findAllActiveDepartamento();
 	}
 
 }

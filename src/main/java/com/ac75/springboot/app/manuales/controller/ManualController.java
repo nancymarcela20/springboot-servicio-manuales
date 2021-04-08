@@ -88,12 +88,12 @@ public class ManualController {
 			byteFileVideo=fileVideo.getBytes();
 		}*/
 		
-		if(!fileImagen.isEmpty()) {
+		if(fileImagen!=null) {
 			byteFileImagen = fileImagen.getBytes();
 			nombreImagen = fileImagen.getOriginalFilename();
 		}
 		
-		if(!fileArchivo.isEmpty()) {
+		if(fileArchivo!=null) {
 			byteFileArchivo = fileArchivo.getBytes();
 			nombreArchivo = fileArchivo.getOriginalFilename();
 		}
